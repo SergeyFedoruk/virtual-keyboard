@@ -1,3 +1,4 @@
+// создаем массив символов
 const keysColl = [
     [
         { code: 'Back-quote', value: '`',valueShift: '~', valueBel: 'ё', valueUppBel: 'Ё' },
@@ -77,6 +78,7 @@ const keysColl = [
     ],
 ];
 
+// создаем клавиши клавиатуры
 const createKeys = (keysColl, key_Board_, lang, upp, display, shift) => {
     const keyboard = key_Board_;
     localStorage.setItem('lng', JSON.stringify(lang));
@@ -153,7 +155,7 @@ const createKeys = (keysColl, key_Board_, lang, upp, display, shift) => {
     });
 };
 
-
+// ввод символов
 const printKey = (d, char, capslock) => {
     let isNeedRender = false;
     let cl = capslock;
@@ -223,3 +225,90 @@ const printKey = (d, char, capslock) => {
     return { isNeedRender, cl };
 };
 
+
+const height_light_keys = (item) => {
+    item.classList.add('keyboard-key-active');
+};
+
+const not_height_light_keys = (item) => {
+    item.classList.remove('keyboard-key-active');
+};
+
+
+//задаем элементы страницы
+
+
+let capslock = false;
+let langBel = JSON.parse(localStorage.getItem('lng')) || false;
+let shift = false;
+
+const { body } = document;
+
+const container = document.createElement('div');
+container.classList.add('container');
+container.innerHTML = '<h1 class="title">RSS Virtual Keyboard</h1>';
+body.append(container);
+
+const displayWrapper = document.createElement('div');
+displayWrapper.classList.add('display-wrapper');
+container.append(displayWrapper);
+
+const display = document.createElement('textarea');
+display.classList.add('display');
+displayWrapper.append(display);
+
+const keyboard = document.createElement('section');
+keyboard.classList.add('keyboard');
+container.append(keyboard);
+
+const text = document.createElement('div');
+text.classList.add('description');
+text.innerHTML = `<p class="description-text">Ctrl + Shift - для переключения раскладки En-Bel</p>
+<p class="description-text">Клавиатура создана в ОС Windows</p>`;
+container.append(text);
+
+document.addEventListener('keydown', (event) => {
+    event.preventDefault();
+
+    if (keyboard.querySelector(`[data-code=${event.code}]`)) {
+        setTimeout(() => {
+            const item = keyboard.querySelector(`[data-code=${event.code}]`);
+            height_light_keys(item);
+        });
+
+        if ((event.key === 'Shift' && event.ctrlKey) || (event.key === 'Control' && event.shiftKey)) {
+            langBel = !langBel;
+            createKeys(keysColl, keyboard, langBel, capslock, display, shift);
+        } else if (event.key === 'Shift') {
+            shift = true;
+            createKeys(keysColl, keyboard, langBel, capslock, display, shift);
+        } else {
+            const char = event.key;
+            const { isNeedRender, cl } = printKey(display, char, capslock);
+            capslock = cl;
+            if (isNeedRender) {
+                createKeys(keysColl, keyboard, langBel, capslock, display, shift);
+            }
+        }
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (keyboard.querySelector(`[data-code=${event.code}]`)) {
+        const item = keyboard.querySelector(`[data-code=${event.code}]`);
+
+        if (event.code !== 'CapsLock' || !capslock) {
+            not_height_light_keys(item);
+        }
+
+        if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+            shift = false;
+            createKeys(keysColl, keyboard, langBel, capslock, display, shift);
+        }
+    }
+});
+
+window.addEventListener('load', () => {
+    const lang = JSON.parse(localStorage.getItem('lng'));
+    createKeys(keysColl, keyboard, lang, capslock, display, shift);
+});

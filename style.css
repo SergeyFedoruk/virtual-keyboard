@@ -17,3 +17,26 @@ body {
     max-width: 1200px;
     margin: 0 auto;
    }
+
+.title {
+    text-align: center;
+    font-size: 36px;
+    line-height: 42px;
+    margin: 20px 0;
+    color: midnightblue;
+}
+
+.display {
+    margin: 25px 120px;
+    display: block;
+    width: 80%;
+    height: 20vh;
+    padding: 10px 20px;
+    word-wrap: break-word;
+    background-color: #fff;
+    outline: none;
+    color: black;
+    font-size: 16px;
+    line-height: 24px;
+}
+  
